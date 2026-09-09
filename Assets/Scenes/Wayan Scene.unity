@@ -3484,6 +3484,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1846033452
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1846033454}
+  - component: {fileID: 1846033453}
+  m_Layer: 0
+  m_Name: ExperienceManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1846033453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1846033452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39dc9c6b597b4b944b4114e22eb6a59c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildings: []
+  clusterCount: 5
+  plane: 0
+  maxIterations: 100
+  restarts: 5
+  seed: 1
+  clusterCenterPrefab: {fileID: 0}
+  clusterNameFormat: Cluster {0} ({1})
+  memberOrder: 2
+  autoRebuild: 1
+  drawGizmos: 1
+  colorizeMembers: 0
+  clusters: []
+--- !u!4 &1846033454
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1846033452}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1884611029
 GameObject:
   m_ObjectHideFlags: 0
@@ -3711,3 +3768,4 @@ SceneRoots:
   - {fileID: 351511056}
   - {fileID: 582990567}
   - {fileID: 1427985663}
+  - {fileID: 1846033454}
