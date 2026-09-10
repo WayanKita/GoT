@@ -65,6 +65,12 @@ public class ClusterSequenceAnimator : MonoBehaviour
     [Tooltip("Shapes the movement over its duration. Linear is a straight ramp.")]
     public AnimationCurve easing = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
+    [Header("Per-object delay")]
+    [Tooltip("Each object inside a cluster waits a random amount before it starts moving (seconds). Set both to 0 for the whole cluster to launch at once.")]
+    [Min(0f)] public float minObjectDelay = 0f;
+
+    [Min(0f)] public float maxObjectDelay = 0.25f;
+
     [Header("Behaviour")]
     public bool playOnStart = true;
 
@@ -231,6 +237,7 @@ public class ClusterSequenceAnimator : MonoBehaviour
         var starts = new List<Vector3>();
         var ends = new List<Vector3>();
         var durations = new List<float>();
+        var delays = new List<float>();
 
         float clusterSpeed = RandomSpeed();
 
@@ -241,14 +248,19 @@ public class ClusterSequenceAnimator : MonoBehaviour
             Vector3 start = StartPositionFor(c.endPosition);
             float distance = Vector3.Distance(start, c.endPosition);
             float speed = randomizePerObject ? RandomSpeed() : clusterSpeed;
+            float delay = RandomRange(minObjectDelay, maxObjectDelay);
 
             items.Add(c.target);
             starts.Add(start);
             ends.Add(c.endPosition);
             durations.Add(speed > 0f ? distance / speed : 0f);
+            delays.Add(delay);
 
             c.target.position = start;
-            c.target.gameObject.SetActive(true);
+
+            // An object with a delay stays hidden until its own turn, otherwise it would
+            // sit visible at the start position while it waits.
+            c.target.gameObject.SetActive(!hideUntilAnimated || delay <= 0f);
         }
 
         if (items.Count == 0) yield break;
@@ -265,7 +277,13 @@ public class ClusterSequenceAnimator : MonoBehaviour
             {
                 if (items[i] == null) continue;
 
-                float t = durations[i] > 0f ? Mathf.Clamp01(elapsed / durations[i]) : 1f;
+                float local = elapsed - delays[i];
+                if (local < 0f) { moving = true; continue; } // still waiting its turn
+
+                if (hideUntilAnimated && !items[i].gameObject.activeSelf)
+                    items[i].gameObject.SetActive(true);
+
+                float t = durations[i] > 0f ? Mathf.Clamp01(local / durations[i]) : 1f;
                 items[i].position = Vector3.LerpUnclamped(starts[i], ends[i], easing.Evaluate(t));
                 if (t < 1f) moving = true;
             }
@@ -278,10 +296,13 @@ public class ClusterSequenceAnimator : MonoBehaviour
             if (items[i] != null) items[i].position = ends[i];
     }
 
-    private float RandomSpeed()
+    private float RandomSpeed() => RandomRange(minSpeed, maxSpeed);
+
+    private float RandomRange(float a, float b)
     {
-        float lo = Mathf.Min(minSpeed, maxSpeed);
-        float hi = Mathf.Max(minSpeed, maxSpeed);
+        float lo = Mathf.Min(a, b);
+        float hi = Mathf.Max(a, b);
+        if (hi <= lo) return lo;
         if (_rng == null) _rng = new System.Random(Environment.TickCount);
         return lo + (float)_rng.NextDouble() * (hi - lo);
     }
