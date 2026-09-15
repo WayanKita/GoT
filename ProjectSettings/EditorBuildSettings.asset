@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/GoTAniamtionCluster.unity
+    guid: bfd3034c31d7abd479cd677eb124727e
   m_configObjects: {}
