@@ -6,6 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/GoTAniamtionCluster.unity
-    guid: bfd3034c31d7abd479cd677eb124727e
+    path: Assets/Scenes/Launcher.unity
+    guid: da1ea4b98ded34f47be8d5afb00e4e04
+  - enabled: 1
+    path: Assets/Scenes/MainScene.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/Ripplescene.unity
+    guid: 71a24d220b3be484a9c136f75a095549
+  - enabled: 1
+    path: Assets/Scenes/Wayan Scene.unity
+    guid: 1d56d85fa5b93bb47b13ce4a5b8ad6ab
   m_configObjects: {}
