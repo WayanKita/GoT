@@ -1,0 +1,374 @@
+fileFormatVersion: 2
+guid: d35bfc7a1bf66d54c8e5eef479e2ddbe
+ModelImporter:
+  serializedVersion: 22200
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: grass_path_2_nor_gl_2k
+    second: {fileID: 2800000, guid: ae69bac8e44d99f4b81ce698443eecb4, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_+00000_+00000
+    second: {fileID: 2800000, guid: 6a144a6fa0328ad48a7865a7194e8d1b, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_+00000_+01000
+    second: {fileID: 2800000, guid: 45e3005f24eb12642b8157e286a3daa8, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_+00000_+02000
+    second: {fileID: 2800000, guid: f736d48d716a72f4ca24394f04f165ce, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_+00000_-01000
+    second: {fileID: 2800000, guid: d7fc385fac0794d46a1d6c4977e83474, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_+00000_-02000
+    second: {fileID: 2800000, guid: e8fec2fa0c8384c44a91667028275870, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_+00000_-03000
+    second: {fileID: 2800000, guid: 0c5f3e22ba4569f40ad0b128d2b7afcf, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_+01000_+00000
+    second: {fileID: 2800000, guid: 988569f7d5efbb6499e7633ae93de9fa, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_+01000_-01000
+    second: {fileID: 2800000, guid: d107dbcdeb09e004a9288b887b307b3a, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_+01000_-02000
+    second: {fileID: 2800000, guid: 0c1a2330e3e13634db2df91198c1574d, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-01000_+00000
+    second: {fileID: 2800000, guid: f99db3bafe2a4784faf8950fad8b6b3b, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-01000_+01000
+    second: {fileID: 2800000, guid: 7bde52ad23b8f494e8ff48bad77eb8ad, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-01000_+02000
+    second: {fileID: 2800000, guid: 8a003fc3dd699304cb06563c93f8acce, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-01000_+03000
+    second: {fileID: 2800000, guid: 8611d22daeceda94d8a95d1af60f7323, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-01000_+04000
+    second: {fileID: 2800000, guid: 7601cdadd50196642918939ce3d28c0f, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-01000_+05000
+    second: {fileID: 2800000, guid: 2f072fe1547295644b47f9ca83730e0d, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-01000_+06000
+    second: {fileID: 2800000, guid: a0cd7d668bff9f046bd29225f7ebf39d, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-01000_-01000
+    second: {fileID: 2800000, guid: 941ee85d48d4e2945b52ca4cc463a77a, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-01000_-02000
+    second: {fileID: 2800000, guid: 0bf192b4d437710429818c2bc2598df6, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-01000_-03000
+    second: {fileID: 2800000, guid: 6318d049aed451d49b649cd18fe0af4a, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-02000_+00000
+    second: {fileID: 2800000, guid: 8edd2dcdb7d00fa4b8b015edf9df5e04, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-02000_+01000
+    second: {fileID: 2800000, guid: 38970432d7d172c409447f8c1031542d, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-02000_+02000
+    second: {fileID: 2800000, guid: d749dd13f4aabd84e8d365c982cd87e4, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-02000_+03000
+    second: {fileID: 2800000, guid: 6fc8ec33af0aa6b41a4a03de709db4ea, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-02000_+04000
+    second: {fileID: 2800000, guid: af201fc7b7257524a9b823723028c1da, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-02000_+05000
+    second: {fileID: 2800000, guid: 145574d48300f8144a1504fa06af6d73, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-02000_+06000
+    second: {fileID: 2800000, guid: 8aac932c9528f5f41b77b15114164f97, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-02000_+07000
+    second: {fileID: 2800000, guid: b357ec77c18c64a4a85bc77f657588aa, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-02000_-01000
+    second: {fileID: 2800000, guid: cad61761bc8dd79428da123d659b6777, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-02000_-02000
+    second: {fileID: 2800000, guid: 398fa644402657d429ff13bf717f13f4, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-02000_-03000
+    second: {fileID: 2800000, guid: a755a3b52b13c324088a335f42cde7b0, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-03000_+00000
+    second: {fileID: 2800000, guid: af10a0d11ee84c441976a1cd33bade3b, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-03000_+01000
+    second: {fileID: 2800000, guid: 7ab97f84b2d27bf4389ba96d800cdc9b, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-03000_+02000
+    second: {fileID: 2800000, guid: 7f8224ca842e5964a83c05d57ffedff7, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-03000_+03000
+    second: {fileID: 2800000, guid: f660d26a6056026499fa6e4c27e976fc, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-03000_+04000
+    second: {fileID: 2800000, guid: 74a7fd5a5e25fc0468188650d833b83c, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-03000_+05000
+    second: {fileID: 2800000, guid: 483fb61b8894b7548995a69e862ec8c7, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-03000_+06000
+    second: {fileID: 2800000, guid: 061a797150ae21b4c909c1654f3883bd, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-03000_+07000
+    second: {fileID: 2800000, guid: 5ceb063a64f800c4daeff4fa20df5d85, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-03000_-01000
+    second: {fileID: 2800000, guid: c3e30e9f2243fac428e8ac58c31368f4, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-03000_-02000
+    second: {fileID: 2800000, guid: 293d92627158800468c9e7b62cbac218, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-03000_-03000
+    second: {fileID: 2800000, guid: 692507012ef2e6648a2973c28352487d, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-04000_+03000
+    second: {fileID: 2800000, guid: 021b4c7d6814eac44af140180b34563e, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-04000_+04000
+    second: {fileID: 2800000, guid: 0fcebacb1b0fbd8468447d92cb24011a, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-04000_+05000
+    second: {fileID: 2800000, guid: 88cc73c8cdb8be34daf2b7493a3db60b, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_-04000_+06000
+    second: {fileID: 2800000, guid: 13a3594bc8bf231409ea309b0fd8d658, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: map_backdrop
+    second: {fileID: 2800000, guid: 1e5e7eb9d8fbea14ca5dde12abf69b51, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tex_derun1000_ground
+    second: {fileID: 2800000, guid: 4f336c8a739944e49898b605be92209c, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tex_derun1000_roofs
+    second: {fileID: 2800000, guid: 4d0d58ae8a530904b9c3539c287ee05f, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tex_louvre
+    second: {fileID: 2800000, guid: 433945c6e7b87a24d84f6cb087eff65a, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tex_maincampus
+    second: {fileID: 2800000, guid: 2bf4ce95f7cd74a4083b2ba009ae620c, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tex_maincampus_ground
+    second: {fileID: 2800000, guid: 9fd87a0418cb37649b3ba60e6ca2eb33, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tex_tower_stone
+    second: {fileID: 2800000, guid: 826e831138fe5c0499aa2101bbc88dfa, type: 3}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
