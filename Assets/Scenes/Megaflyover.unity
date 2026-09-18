@@ -25614,6 +25614,7 @@ GameObject:
   m_Component:
   - component: {fileID: 543450653145240479}
   - component: {fileID: 919132148669958438}
+  - component: {fileID: 919132148669958439}
   m_Layer: 0
   m_Name: flyover
   m_TagString: Untagged
@@ -26152,6 +26153,82 @@ MonoBehaviour:
   - {fileID: 1900266541}
   - {fileID: 309477751}
   - {fileID: 684850270}
+--- !u!114 &919132148669958439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132148669958437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0301829fa50249743abc4ca5cd8ea5b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clusterOrder:
+  - {fileID: 1686000}
+  - {fileID: 1754754646}
+  - {fileID: 1579772422}
+  - {fileID: 1149407005}
+  - {fileID: 2021788806}
+  - {fileID: 313825172}
+  - {fileID: 76796997}
+  - {fileID: 1928972481}
+  - {fileID: 1831923079}
+  - {fileID: 299956787}
+  - {fileID: 1026123439}
+  - {fileID: 279052020}
+  - {fileID: 1906422195}
+  - {fileID: 383206985}
+  - {fileID: 2035978214}
+  - {fileID: 2032339017}
+  - {fileID: 1589064922}
+  - {fileID: 1900266542}
+  - {fileID: 309477752}
+  - {fileID: 684850271}
+  animateChildren: 1
+  waitForClusterToFinish: 1
+  delayBetweenClusters: 0
+  startY: -0.2
+  startYIsOffset: 0
+  minSpeed: 0.05
+  maxSpeed: 0.4
+  randomizePerObject: 1
+  easing:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  minObjectDelay: 0
+  maxObjectDelay: 2
+  playOnStart: 1
+  hideUntilAnimated: 1
+  useUnscaledTime: 0
+  deterministic: 0
+  seed: 1
+  onSequenceComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  captured: []
 --- !u!33 &920717448288279998
 MeshFilter:
   m_ObjectHideFlags: 0
