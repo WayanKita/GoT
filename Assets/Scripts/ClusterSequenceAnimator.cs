@@ -17,7 +17,14 @@ using UnityEditor;
 //  Setup:
 //    1. Add to CampusTest, hit "Populate From Children" in the context menu.
 //    2. Drag the entries in Cluster Order to set the sequence.
-//    3. Press play, or call Play() from another script / a UI button.
+//    3. Optional: turn on Use Timings and fill in Cluster Start Times.
+//    4. Press play, or call Play() from another script / a UI button.
+//
+//  Timings:
+//    With Use Timings on, cluster N starts at Cluster Start Times[N] seconds after Play(),
+//    regardless of whether earlier clusters have landed. Entries line up with Cluster
+//    Order by index, so if you reorder clusters, reorder the times too. Times don't have
+//    to be ascending. A missing entry falls back to (previous time + Delay Between Clusters).
 //
 //  The authored positions are captured once and serialized, so snapping to the start
 //  position in the editor can't destroy them.
@@ -41,11 +48,18 @@ public class ClusterSequenceAnimator : MonoBehaviour
     [Tooltip("On: animate every child of a cluster. Off: animate the cluster object itself, so its children come along.")]
     public bool animateChildren = true;
 
-    [Tooltip("On: a cluster must land before the next one starts. Off: clusters overlap, launched every Delay seconds.")]
+    [Tooltip("On: a cluster must land before the next one starts. Off: clusters overlap, launched every Delay seconds. Ignored when Use Timings is on.")]
     public bool waitForClusterToFinish = true;
 
-    [Tooltip("Pause between clusters (seconds). Also the stagger interval when Wait For Cluster To Finish is off.")]
+    [Tooltip("Pause between clusters (seconds). Also the stagger interval when Wait For Cluster To Finish is off, and the fallback spacing for missing timing entries.")]
     [Min(0f)] public float delayBetweenClusters = 0.15f;
+
+    [Header("Timings")]
+    [Tooltip("On: each cluster starts at its entry in Cluster Start Times. Off: use the sequential settings above.")]
+    public bool useTimings = false;
+
+    [Tooltip("Start time per cluster, in seconds after Play(). Index matches Cluster Order.")]
+    public List<float> clusterStartTimes = new List<float>();
 
     [Header("Start position (A)")]
     [Tooltip("X and Z are kept; Y is replaced by this value.")]
@@ -97,6 +111,7 @@ public class ClusterSequenceAnimator : MonoBehaviour
 
     private Coroutine _routine;
     private System.Random _rng;
+    private int _activeClusters;
 
     public bool IsPlaying => _routine != null;
 
@@ -110,6 +125,11 @@ public class ClusterSequenceAnimator : MonoBehaviour
     private void Start()
     {
         if (playOnStart) Play();
+    }
+
+    private void OnValidate()
+    {
+        SyncTimings();
     }
 
     // ---------------------------------------------------------------- public API
@@ -134,8 +154,10 @@ public class ClusterSequenceAnimator : MonoBehaviour
     /// <summary>Halts mid-animation, leaving everything where it is.</summary>
     public void Stop()
     {
-        if (_routine != null) StopCoroutine(_routine);
+        // Stops the sequence and any clusters still in flight.
+        StopAllCoroutines();
         _routine = null;
+        _activeClusters = 0;
     }
 
     /// <summary>Re-reads the current positions as the authored end positions (B).</summary>
@@ -167,7 +189,18 @@ public class ClusterSequenceAnimator : MonoBehaviour
     {
         clusterOrder.Clear();
         foreach (Transform child in transform) clusterOrder.Add(child);
+        SyncTimings();
         CaptureTargets();
+    }
+
+    /// <summary>Overwrites Cluster Start Times with an even spacing of Delay Between Clusters.</summary>
+    [ContextMenu("Fill Timings From Delay")]
+    public void FillTimingsFromDelay()
+    {
+        clusterStartTimes.Clear();
+        for (int i = 0; i < clusterOrder.Count; i++)
+            clusterStartTimes.Add(i * delayBetweenClusters);
+        MarkDirty();
     }
 
     /// <summary>Moves everything to position A. Safe in the editor: targets are captured first.</summary>
@@ -198,9 +231,36 @@ public class ClusterSequenceAnimator : MonoBehaviour
         MarkDirty();
     }
 
+    /// <summary>Start time (seconds after Play) for the cluster at this index in Cluster Order.</summary>
+    public float GetClusterStartTime(int index)
+    {
+        float time = 0f;
+        for (int i = 0; i <= index; i++)
+        {
+            if (i < clusterStartTimes.Count) time = Mathf.Max(0f, clusterStartTimes[i]);
+            else if (i > 0) time += delayBetweenClusters;
+        }
+        return time;
+    }
+
     // ---------------------------------------------------------------- animation
 
     private IEnumerator PlaySequence()
+    {
+        _activeClusters = 0;
+
+        if (useTimings) yield return PlayTimed();
+        else yield return PlaySequential();
+
+        // Overlapping or timed clusters may still be in flight.
+        while (_activeClusters > 0) yield return null;
+
+        _routine = null;
+        SequenceComplete?.Invoke();
+        onSequenceComplete?.Invoke();
+    }
+
+    private IEnumerator PlaySequential()
     {
         for (int i = 0; i < clusterOrder.Count; i++)
         {
@@ -209,25 +269,47 @@ public class ClusterSequenceAnimator : MonoBehaviour
 
             ClusterStarted?.Invoke(cluster, i);
 
-            if (waitForClusterToFinish)
-            {
-                yield return AnimateCluster(cluster);
-                if (delayBetweenClusters > 0f) yield return Wait(delayBetweenClusters);
-            }
-            else
-            {
-                StartCoroutine(AnimateCluster(cluster));
-                if (delayBetweenClusters > 0f) yield return Wait(delayBetweenClusters);
-            }
+            if (waitForClusterToFinish) yield return RunCluster(cluster);
+            else StartCoroutine(RunCluster(cluster));
+
+            if (delayBetweenClusters > 0f) yield return Wait(delayBetweenClusters);
         }
+    }
 
-        // With overlapping clusters the last ones may still be in flight.
-        if (!waitForClusterToFinish)
-            while (AnyStillMoving()) yield return null;
+    private IEnumerator PlayTimed()
+    {
+        // Launch order sorted by start time; ties keep Cluster Order.
+        var order = new List<int>();
+        for (int i = 0; i < clusterOrder.Count; i++)
+            if (clusterOrder[i] != null) order.Add(i);
 
-        _routine = null;
-        SequenceComplete?.Invoke();
-        onSequenceComplete?.Invoke();
+        order.Sort((a, b) =>
+        {
+            int cmp = GetClusterStartTime(a).CompareTo(GetClusterStartTime(b));
+            return cmp != 0 ? cmp : a.CompareTo(b);
+        });
+
+        float elapsed = 0f;
+        foreach (int index in order)
+        {
+            float startTime = GetClusterStartTime(index);
+            while (elapsed < startTime)
+            {
+                yield return null;
+                elapsed += useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            }
+
+            var cluster = clusterOrder[index];
+            ClusterStarted?.Invoke(cluster, index);
+            StartCoroutine(RunCluster(cluster));
+        }
+    }
+
+    private IEnumerator RunCluster(Transform cluster)
+    {
+        _activeClusters++;
+        yield return AnimateCluster(cluster);
+        _activeClusters--;
     }
 
     private IEnumerator AnimateCluster(Transform cluster)
@@ -296,6 +378,24 @@ public class ClusterSequenceAnimator : MonoBehaviour
             if (items[i] != null) items[i].position = ends[i];
     }
 
+    // ---------------------------------------------------------------- helpers
+
+    /// <summary>Keeps Cluster Start Times the same length as Cluster Order, padding new entries.</summary>
+    private void SyncTimings()
+    {
+        if (clusterStartTimes == null) clusterStartTimes = new List<float>();
+
+        while (clusterStartTimes.Count < clusterOrder.Count)
+        {
+            int i = clusterStartTimes.Count;
+            float previous = i > 0 ? clusterStartTimes[i - 1] : -delayBetweenClusters;
+            clusterStartTimes.Add(Mathf.Max(0f, previous + delayBetweenClusters));
+        }
+
+        if (clusterStartTimes.Count > clusterOrder.Count)
+            clusterStartTimes.RemoveRange(clusterOrder.Count, clusterStartTimes.Count - clusterOrder.Count);
+    }
+
     private float RandomSpeed() => RandomRange(minSpeed, maxSpeed);
 
     private float RandomRange(float a, float b)
@@ -309,16 +409,6 @@ public class ClusterSequenceAnimator : MonoBehaviour
 
     private Vector3 StartPositionFor(Vector3 end) =>
         new Vector3(end.x, startYIsOffset ? end.y + startY : startY, end.z);
-
-    private bool AnyStillMoving()
-    {
-        foreach (var c in captured)
-        {
-            if (c.target == null) continue;
-            if ((c.target.position - c.endPosition).sqrMagnitude > 1e-8f) return true;
-        }
-        return false;
-    }
 
     private IEnumerator Wait(float seconds) =>
         useUnscaledTime ? WaitUnscaled(seconds) : WaitScaled(seconds);
