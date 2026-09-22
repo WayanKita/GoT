@@ -15,6 +15,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Ripplescene.unity
     guid: 71a24d220b3be484a9c136f75a095549
   - enabled: 1
-    path: Assets/Scenes/Wayan Scene.unity
+    path: Assets/Scenes/BIC North.unity
     guid: 1d56d85fa5b93bb47b13ce4a5b8ad6ab
   m_configObjects: {}
