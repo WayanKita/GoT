@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -21,10 +22,20 @@ using UnityEditor;
 //    4. Press play, or call Play() from another script / a UI button.
 //
 //  Timings:
-//    With Use Timings on, cluster N starts at Cluster Start Times[N] seconds after Play(),
-//    regardless of whether earlier clusters have landed. Entries line up with Cluster
-//    Order by index, so if you reorder clusters, reorder the times too. Times don't have
-//    to be ascending. A missing entry falls back to (previous time + Delay Between Clusters).
+//    With Use Timings on, each entry represents the delay from the PREVIOUS cluster's
+//    start time. The first entry represents the delay after Play().
+//    Example:
+//        [0, 1, 3, 2]
+//    results in absolute start times:
+//        Cluster 0 = 0s
+//        Cluster 1 = 1s
+//        Cluster 2 = 4s
+//        Cluster 3 = 6s
+//
+//    Entries line up with Cluster Order by index, so if you reorder clusters,
+//    reorder the timing entries too.
+//
+//    Missing entries fall back to Delay Between Clusters.
 //
 //  The authored positions are captured once and serialized, so snapping to the start
 //  position in the editor can't destroy them.
@@ -52,13 +63,14 @@ public class ClusterSequenceAnimator : MonoBehaviour
     public bool waitForClusterToFinish = true;
 
     [Tooltip("Pause between clusters (seconds). Also the stagger interval when Wait For Cluster To Finish is off, and the fallback spacing for missing timing entries.")]
-    [Min(0f)] public float delayBetweenClusters = 0.15f;
+    [Min(0f)]
+    public float delayBetweenClusters = 0.15f;
 
     [Header("Timings")]
-    [Tooltip("On: each cluster starts at its entry in Cluster Start Times. Off: use the sequential settings above.")]
+    [Tooltip("On: each timing entry is the delay from the previous cluster's START. The first entry is the delay after Play(). Off: use the sequential settings above.")]
     public bool useTimings = false;
 
-    [Tooltip("Start time per cluster, in seconds after Play(). Index matches Cluster Order.")]
+    [Tooltip("Delay before each cluster starts, measured from when the previous cluster started. The first entry is the delay after Play(). Index matches Cluster Order.")]
     public List<float> clusterStartTimes = new List<float>();
 
     [Header("Start position (A)")]
@@ -71,6 +83,7 @@ public class ClusterSequenceAnimator : MonoBehaviour
     [Header("Speed")]
     [Tooltip("World units per second. A speed is drawn from this range for each cluster.")]
     public float minSpeed = 0.05f;
+
     public float maxSpeed = 0.2f;
 
     [Tooltip("On: every object rolls its own speed. Off: one speed per cluster.")]
@@ -81,9 +94,11 @@ public class ClusterSequenceAnimator : MonoBehaviour
 
     [Header("Per-object delay")]
     [Tooltip("Each object inside a cluster waits a random amount before it starts moving (seconds). Set both to 0 for the whole cluster to launch at once.")]
-    [Min(0f)] public float minObjectDelay = 0f;
+    [Min(0f)]
+    public float minObjectDelay = 0f;
 
-    [Min(0f)] public float maxObjectDelay = 0.25f;
+    [Min(0f)]
+    public float maxObjectDelay = 0.25f;
 
     [Header("Behaviour")]
     public bool playOnStart = true;
@@ -96,18 +111,24 @@ public class ClusterSequenceAnimator : MonoBehaviour
 
     [Tooltip("On: the same seed reproduces the same speeds every run.")]
     public bool deterministic = false;
+
     public int seed = 1;
 
     [Header("Events")]
     public UnityEvent onSequenceComplete;
 
-    /// <summary>Fires as each cluster starts, with its position in the sequence.</summary>
+    /// <summary>
+    /// Fires as each cluster starts, with its position in the sequence.
+    /// </summary>
     public event Action<Transform, int> ClusterStarted;
 
-    /// <summary>Fires once the whole sequence has landed.</summary>
+    /// <summary>
+    /// Fires once the whole sequence has landed.
+    /// </summary>
     public event Action SequenceComplete;
 
-    [SerializeField, HideInInspector] private List<Captured> captured = new List<Captured>();
+    [SerializeField, HideInInspector]
+    private List<Captured> captured = new List<Captured>();
 
     private Coroutine _routine;
     private System.Random _rng;
@@ -119,12 +140,14 @@ public class ClusterSequenceAnimator : MonoBehaviour
 
     private void Awake()
     {
-        if (captured.Count == 0) CaptureTargets();
+        if (captured.Count == 0)
+            CaptureTargets();
     }
 
     private void Start()
     {
-        if (playOnStart) Play();
+        if (playOnStart)
+            Play();
     }
 
     private void OnValidate()
@@ -134,33 +157,50 @@ public class ClusterSequenceAnimator : MonoBehaviour
 
     // ---------------------------------------------------------------- public API
 
-    /// <summary>Runs the whole sequence from the beginning.</summary>
+    /// <summary>
+    /// Runs the whole sequence from the beginning.
+    /// </summary>
     public void Play()
     {
         if (!Application.isPlaying)
         {
-            Debug.LogWarning("ClusterSequenceAnimator.Play() only runs in play mode.", this);
+            Debug.LogWarning(
+                "ClusterSequenceAnimator.Play() only runs in play mode.",
+                this
+            );
+
             return;
         }
 
-        if (captured.Count == 0) CaptureTargets();
+        if (captured.Count == 0)
+            CaptureTargets();
 
         Stop();
-        _rng = deterministic ? new System.Random(seed) : new System.Random(Environment.TickCount);
+
+        _rng = deterministic
+            ? new System.Random(seed)
+            : new System.Random(Environment.TickCount);
+
         SnapToStart();
+
         _routine = StartCoroutine(PlaySequence());
     }
 
-    /// <summary>Halts mid-animation, leaving everything where it is.</summary>
+    /// <summary>
+    /// Halts mid-animation, leaving everything where it is.
+    /// </summary>
     public void Stop()
     {
         // Stops the sequence and any clusters still in flight.
         StopAllCoroutines();
+
         _routine = null;
         _activeClusters = 0;
     }
 
-    /// <summary>Re-reads the current positions as the authored end positions (B).</summary>
+    /// <summary>
+    /// Re-reads the current positions as the authored end positions (B).
+    /// </summary>
     [ContextMenu("Capture Target Positions")]
     public void CaptureTargets()
     {
@@ -168,78 +208,150 @@ public class ClusterSequenceAnimator : MonoBehaviour
 
         foreach (var cluster in clusterOrder)
         {
-            if (cluster == null) continue;
+            if (cluster == null)
+                continue;
 
             if (!animateChildren)
             {
-                captured.Add(new Captured { cluster = cluster, target = cluster, endPosition = cluster.position });
+                captured.Add(
+                    new Captured
+                    {
+                        cluster = cluster,
+                        target = cluster,
+                        endPosition = cluster.position
+                    }
+                );
+
                 continue;
             }
 
             foreach (Transform child in cluster)
-                captured.Add(new Captured { cluster = cluster, target = child, endPosition = child.position });
+            {
+                captured.Add(
+                    new Captured
+                    {
+                        cluster = cluster,
+                        target = child,
+                        endPosition = child.position
+                    }
+                );
+            }
         }
 
         MarkDirty();
     }
 
-    /// <summary>Fills Cluster Order from the current children, in hierarchy order.</summary>
+    /// <summary>
+    /// Fills Cluster Order from the current children, in hierarchy order.
+    /// </summary>
     [ContextMenu("Populate From Children")]
     public void PopulateFromChildren()
     {
         clusterOrder.Clear();
-        foreach (Transform child in transform) clusterOrder.Add(child);
+
+        foreach (Transform child in transform)
+            clusterOrder.Add(child);
+
         SyncTimings();
         CaptureTargets();
     }
 
-    /// <summary>Overwrites Cluster Start Times with an even spacing of Delay Between Clusters.</summary>
+    /// <summary>
+    /// Overwrites Cluster Start Times so every cluster starts
+    /// Delay Between Clusters seconds after the previous cluster starts.
+    /// The first cluster starts immediately.
+    /// </summary>
     [ContextMenu("Fill Timings From Delay")]
     public void FillTimingsFromDelay()
     {
         clusterStartTimes.Clear();
+
         for (int i = 0; i < clusterOrder.Count; i++)
-            clusterStartTimes.Add(i * delayBetweenClusters);
+        {
+            clusterStartTimes.Add(
+                i == 0
+                    ? 0f
+                    : delayBetweenClusters
+            );
+        }
+
         MarkDirty();
     }
 
-    /// <summary>Moves everything to position A. Safe in the editor: targets are captured first.</summary>
+    /// <summary>
+    /// Moves everything to position A.
+    /// Safe in the editor: targets are captured first.
+    /// </summary>
     [ContextMenu("Snap To Start")]
     public void SnapToStart()
     {
-        if (captured.Count == 0) CaptureTargets();
+        if (captured.Count == 0)
+            CaptureTargets();
 
         foreach (var c in captured)
         {
-            if (c.target == null) continue;
+            if (c.target == null)
+                continue;
+
             c.target.position = StartPositionFor(c.endPosition);
-            if (hideUntilAnimated && Application.isPlaying) c.target.gameObject.SetActive(false);
+
+            if (hideUntilAnimated && Application.isPlaying)
+                c.target.gameObject.SetActive(false);
         }
+
         MarkDirty();
     }
 
-    /// <summary>Restores everything to position B.</summary>
+    /// <summary>
+    /// Restores everything to position B.
+    /// </summary>
     [ContextMenu("Snap To End")]
     public void SnapToEnd()
     {
         foreach (var c in captured)
         {
-            if (c.target == null) continue;
+            if (c.target == null)
+                continue;
+
             c.target.position = c.endPosition;
             c.target.gameObject.SetActive(true);
         }
+
         MarkDirty();
     }
 
-    /// <summary>Start time (seconds after Play) for the cluster at this index in Cluster Order.</summary>
+    /// <summary>
+    /// Returns the absolute start time in seconds after Play()
+    /// for the cluster at this index.
+    ///
+    /// Each Cluster Start Times entry is interpreted as the delay
+    /// since the previous cluster STARTED.
+    ///
+    /// Example:
+    ///     [0, 1, 3, 2]
+    ///
+    /// Produces:
+    ///     Cluster 0 = 0s
+    ///     Cluster 1 = 1s
+    ///     Cluster 2 = 4s
+    ///     Cluster 3 = 6s
+    /// </summary>
     public float GetClusterStartTime(int index)
     {
         float time = 0f;
+
         for (int i = 0; i <= index; i++)
         {
-            if (i < clusterStartTimes.Count) time = Mathf.Max(0f, clusterStartTimes[i]);
-            else if (i > 0) time += delayBetweenClusters;
+            if (i < clusterStartTimes.Count)
+            {
+                time += Mathf.Max(0f, clusterStartTimes[i]);
+            }
+            else
+            {
+                time += delayBetweenClusters;
+            }
         }
+
         return time;
     }
 
@@ -249,13 +361,21 @@ public class ClusterSequenceAnimator : MonoBehaviour
     {
         _activeClusters = 0;
 
-        if (useTimings) yield return PlayTimed();
-        else yield return PlaySequential();
+        if (useTimings)
+        {
+            yield return PlayTimed();
+        }
+        else
+        {
+            yield return PlaySequential();
+        }
 
         // Overlapping or timed clusters may still be in flight.
-        while (_activeClusters > 0) yield return null;
+        while (_activeClusters > 0)
+            yield return null;
 
         _routine = null;
+
         SequenceComplete?.Invoke();
         onSequenceComplete?.Invoke();
     }
@@ -265,42 +385,73 @@ public class ClusterSequenceAnimator : MonoBehaviour
         for (int i = 0; i < clusterOrder.Count; i++)
         {
             var cluster = clusterOrder[i];
-            if (cluster == null) continue;
+
+            if (cluster == null)
+                continue;
 
             ClusterStarted?.Invoke(cluster, i);
 
-            if (waitForClusterToFinish) yield return RunCluster(cluster);
-            else StartCoroutine(RunCluster(cluster));
+            if (waitForClusterToFinish)
+            {
+                yield return RunCluster(cluster);
+            }
+            else
+            {
+                StartCoroutine(RunCluster(cluster));
+            }
 
-            if (delayBetweenClusters > 0f) yield return Wait(delayBetweenClusters);
+            if (delayBetweenClusters > 0f)
+                yield return Wait(delayBetweenClusters);
         }
     }
 
     private IEnumerator PlayTimed()
     {
-        // Launch order sorted by start time; ties keep Cluster Order.
+        // Get all valid cluster indices.
         var order = new List<int>();
-        for (int i = 0; i < clusterOrder.Count; i++)
-            if (clusterOrder[i] != null) order.Add(i);
 
-        order.Sort((a, b) =>
+        for (int i = 0; i < clusterOrder.Count; i++)
         {
-            int cmp = GetClusterStartTime(a).CompareTo(GetClusterStartTime(b));
-            return cmp != 0 ? cmp : a.CompareTo(b);
-        });
+            if (clusterOrder[i] != null)
+                order.Add(i);
+        }
+
+        // GetClusterStartTime converts the relative delays into
+        // absolute start times.
+        //
+        // Sorting is retained so the system remains robust even if
+        // timing behaviour changes later.
+        order.Sort(
+            (a, b) =>
+            {
+                int cmp = GetClusterStartTime(a)
+                    .CompareTo(GetClusterStartTime(b));
+
+                return cmp != 0
+                    ? cmp
+                    : a.CompareTo(b);
+            }
+        );
 
         float elapsed = 0f;
+
         foreach (int index in order)
         {
             float startTime = GetClusterStartTime(index);
+
             while (elapsed < startTime)
             {
                 yield return null;
-                elapsed += useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+
+                elapsed += useUnscaledTime
+                    ? Time.unscaledDeltaTime
+                    : Time.deltaTime;
             }
 
             var cluster = clusterOrder[index];
+
             ClusterStarted?.Invoke(cluster, index);
+
             StartCoroutine(RunCluster(cluster));
         }
     }
@@ -308,13 +459,16 @@ public class ClusterSequenceAnimator : MonoBehaviour
     private IEnumerator RunCluster(Transform cluster)
     {
         _activeClusters++;
+
         yield return AnimateCluster(cluster);
+
         _activeClusters--;
     }
 
     private IEnumerator AnimateCluster(Transform cluster)
     {
-        // Gather this cluster's items and work out how long each takes at its speed.
+        // Gather this cluster's items and work out how long
+        // each one takes at its speed.
         var items = new List<Transform>();
         var starts = new List<Vector3>();
         var ends = new List<Vector3>();
@@ -325,49 +479,92 @@ public class ClusterSequenceAnimator : MonoBehaviour
 
         foreach (var c in captured)
         {
-            if (c.cluster != cluster || c.target == null) continue;
+            if (c.cluster != cluster || c.target == null)
+                continue;
 
             Vector3 start = StartPositionFor(c.endPosition);
-            float distance = Vector3.Distance(start, c.endPosition);
-            float speed = randomizePerObject ? RandomSpeed() : clusterSpeed;
-            float delay = RandomRange(minObjectDelay, maxObjectDelay);
+
+            float distance =
+                Vector3.Distance(start, c.endPosition);
+
+            float speed = randomizePerObject
+                ? RandomSpeed()
+                : clusterSpeed;
+
+            float delay =
+                RandomRange(minObjectDelay, maxObjectDelay);
 
             items.Add(c.target);
             starts.Add(start);
             ends.Add(c.endPosition);
-            durations.Add(speed > 0f ? distance / speed : 0f);
+
+            durations.Add(
+                speed > 0f
+                    ? distance / speed
+                    : 0f
+            );
+
             delays.Add(delay);
 
             c.target.position = start;
 
-            // An object with a delay stays hidden until its own turn, otherwise it would
-            // sit visible at the start position while it waits.
-            c.target.gameObject.SetActive(!hideUntilAnimated || delay <= 0f);
+            // An object with a delay stays hidden until its own turn.
+            // Otherwise it would sit visible at the start position
+            // while it waits.
+            c.target.gameObject.SetActive(
+                !hideUntilAnimated || delay <= 0f
+            );
         }
 
-        if (items.Count == 0) yield break;
+        if (items.Count == 0)
+            yield break;
 
         float elapsed = 0f;
         bool moving = true;
 
         while (moving)
         {
-            elapsed += useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            elapsed += useUnscaledTime
+                ? Time.unscaledDeltaTime
+                : Time.deltaTime;
+
             moving = false;
 
             for (int i = 0; i < items.Count; i++)
             {
-                if (items[i] == null) continue;
+                if (items[i] == null)
+                    continue;
 
                 float local = elapsed - delays[i];
-                if (local < 0f) { moving = true; continue; } // still waiting its turn
 
-                if (hideUntilAnimated && !items[i].gameObject.activeSelf)
+                // Still waiting for this object's individual delay.
+                if (local < 0f)
+                {
+                    moving = true;
+                    continue;
+                }
+
+                if (
+                    hideUntilAnimated &&
+                    !items[i].gameObject.activeSelf
+                )
+                {
                     items[i].gameObject.SetActive(true);
+                }
 
-                float t = durations[i] > 0f ? Mathf.Clamp01(local / durations[i]) : 1f;
-                items[i].position = Vector3.LerpUnclamped(starts[i], ends[i], easing.Evaluate(t));
-                if (t < 1f) moving = true;
+                float t = durations[i] > 0f
+                    ? Mathf.Clamp01(local / durations[i])
+                    : 1f;
+
+                items[i].position =
+                    Vector3.LerpUnclamped(
+                        starts[i],
+                        ends[i],
+                        easing.Evaluate(t)
+                    );
+
+                if (t < 1f)
+                    moving = true;
             }
 
             yield return null;
@@ -375,43 +572,85 @@ public class ClusterSequenceAnimator : MonoBehaviour
 
         // Kill any floating-point drift.
         for (int i = 0; i < items.Count; i++)
-            if (items[i] != null) items[i].position = ends[i];
+        {
+            if (items[i] != null)
+                items[i].position = ends[i];
+        }
     }
 
     // ---------------------------------------------------------------- helpers
 
-    /// <summary>Keeps Cluster Start Times the same length as Cluster Order, padding new entries.</summary>
+    /// <summary>
+    /// Keeps Cluster Start Times the same length as Cluster Order.
+    ///
+    /// Each value represents the delay since the previous cluster
+    /// started.
+    ///
+    /// New clusters use Delay Between Clusters as their default delay,
+    /// except the first cluster, which starts immediately.
+    /// </summary>
     private void SyncTimings()
     {
-        if (clusterStartTimes == null) clusterStartTimes = new List<float>();
+        if (clusterStartTimes == null)
+            clusterStartTimes = new List<float>();
 
         while (clusterStartTimes.Count < clusterOrder.Count)
         {
             int i = clusterStartTimes.Count;
-            float previous = i > 0 ? clusterStartTimes[i - 1] : -delayBetweenClusters;
-            clusterStartTimes.Add(Mathf.Max(0f, previous + delayBetweenClusters));
+
+            clusterStartTimes.Add(
+                i == 0
+                    ? 0f
+                    : delayBetweenClusters
+            );
         }
 
         if (clusterStartTimes.Count > clusterOrder.Count)
-            clusterStartTimes.RemoveRange(clusterOrder.Count, clusterStartTimes.Count - clusterOrder.Count);
+        {
+            clusterStartTimes.RemoveRange(
+                clusterOrder.Count,
+                clusterStartTimes.Count - clusterOrder.Count
+            );
+        }
     }
 
-    private float RandomSpeed() => RandomRange(minSpeed, maxSpeed);
+    private float RandomSpeed()
+    {
+        return RandomRange(minSpeed, maxSpeed);
+    }
 
     private float RandomRange(float a, float b)
     {
         float lo = Mathf.Min(a, b);
         float hi = Mathf.Max(a, b);
-        if (hi <= lo) return lo;
-        if (_rng == null) _rng = new System.Random(Environment.TickCount);
-        return lo + (float)_rng.NextDouble() * (hi - lo);
+
+        if (hi <= lo)
+            return lo;
+
+        if (_rng == null)
+            _rng = new System.Random(Environment.TickCount);
+
+        return lo +
+               (float)_rng.NextDouble() * (hi - lo);
     }
 
-    private Vector3 StartPositionFor(Vector3 end) =>
-        new Vector3(end.x, startYIsOffset ? end.y + startY : startY, end.z);
+    private Vector3 StartPositionFor(Vector3 end)
+    {
+        return new Vector3(
+            end.x,
+            startYIsOffset
+                ? end.y + startY
+                : startY,
+            end.z
+        );
+    }
 
-    private IEnumerator Wait(float seconds) =>
-        useUnscaledTime ? WaitUnscaled(seconds) : WaitScaled(seconds);
+    private IEnumerator Wait(float seconds)
+    {
+        return useUnscaledTime
+            ? WaitUnscaled(seconds)
+            : WaitScaled(seconds);
+    }
 
     private IEnumerator WaitScaled(float seconds)
     {
@@ -421,16 +660,28 @@ public class ClusterSequenceAnimator : MonoBehaviour
     private IEnumerator WaitUnscaled(float seconds)
     {
         float t = 0f;
-        while (t < seconds) { t += Time.unscaledDeltaTime; yield return null; }
+
+        while (t < seconds)
+        {
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
     }
 
     private void MarkDirty()
     {
 #if UNITY_EDITOR
-        if (Application.isPlaying) return;
+        if (Application.isPlaying)
+            return;
+
         EditorUtility.SetDirty(this);
+
         if (gameObject.scene.IsValid())
-            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(gameObject.scene);
+        {
+            UnityEditor.SceneManagement
+                .EditorSceneManager
+                .MarkSceneDirty(gameObject.scene);
+        }
 #endif
     }
 
@@ -438,9 +689,16 @@ public class ClusterSequenceAnimator : MonoBehaviour
     {
         foreach (var c in captured)
         {
-            if (c.target == null) continue;
-            Gizmos.color = new Color(1f, 1f, 1f, 0.35f);
-            Gizmos.DrawLine(StartPositionFor(c.endPosition), c.endPosition);
+            if (c.target == null)
+                continue;
+
+            Gizmos.color =
+                new Color(1f, 1f, 1f, 0.35f);
+
+            Gizmos.DrawLine(
+                StartPositionFor(c.endPosition),
+                c.endPosition
+            );
         }
     }
 }
